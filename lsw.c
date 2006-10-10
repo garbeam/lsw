@@ -45,12 +45,12 @@ main(int argc, char *argv[]) {
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
-	if((argc) > 1 && !strncmp(argv[1], "-v", 3)) {
+	if((argc > 1) && !strncmp(argv[1], "-v", 3)) {
 		fputs("lsw-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
 		exit(EXIT_SUCCESS);
 	}
 	if(!(dpy = XOpenDisplay(0))) {
-		fputs("wtool: cannot open display\n", stderr);
+		fputs("lsw: cannot open display\n", stderr);
 		exit(EXIT_FAILURE);
 	}
 	root = RootWindow(dpy, DefaultScreen(dpy));
