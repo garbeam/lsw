@@ -1,0 +1,24 @@
+lsw - list window titles
+========================
+Prints all window titles of DISPLAY to standard output.
+
+
+Requirements
+------------
+In order to build lsw you need the Xlib header files.
+
+
+Installation
+------------
+Edit config.mk to match your local setup (lsw is installed into
+the /usr/local namespace by default).
+
+Afterwards enter the following command to build and install lsw (if
+necessary as root):
+
+    make clean install
+
+
+Running lsw
+-----------
+Simply invoke the 'lsw' command.
