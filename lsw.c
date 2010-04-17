@@ -11,7 +11,6 @@
 static char buf[1024];
 static Atom netwmname;
 static Display *dpy;
-static Window root;
 
 static void
 getname(Window w) {
@@ -44,6 +43,7 @@ main(int argc, char *argv[]) {
 	unsigned int i, num;
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
+	Window win;
 
 	if((argc > 1) && !strncmp(argv[1], "-v", 3)) {
 		fputs("lsw-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
@@ -53,9 +53,13 @@ main(int argc, char *argv[]) {
 		fputs("lsw: cannot open display\n", stderr);
 		exit(EXIT_FAILURE);
 	}
-	root = RootWindow(dpy, DefaultScreen(dpy));
+	if(argc == 2)
+		win = atoi(argv[1]);
+	else
+		win = DefaultRootWindow(dpy);
+
 	netwmname = XInternAtom(dpy, "_NET_WM_NAME", False);
-	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
+	if(XQueryTree(dpy, win, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
 			if(!XGetWindowAttributes(dpy, wins[i], &wa))
 				continue;
