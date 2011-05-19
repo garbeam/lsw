@@ -1,6 +1,4 @@
-/* (C)opyright MMVI Anselm R. Garbe <garbeam at gmail dot com>
- * See LICENSE file for license details.
- */
+/* See LICENSE file for copyright and license details. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,70 +6,77 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-static char buf[1024];
+static void getname(Window win, char *buf, size_t size);
+static void lsw(Window win);
+
 static Atom netwmname;
+static Bool longfmt = False;
 static Display *dpy;
 
-static void
-getname(Window w) {
+int
+main(int argc, char *argv[]) {
+	int i;
+
+	if(!(dpy = XOpenDisplay(NULL))) {
+		fputs("lsw: cannot open display\n", stderr);
+		exit(EXIT_FAILURE);
+	}
+	netwmname = XInternAtom(dpy, "_NET_WM_NAME", False);
+
+	for(i = 1; i < argc; i++)
+		if(!strcmp(argv[i], "-v")) {
+			puts("lsw-"VERSION", © 2006-2011 lsw engineers, see LICENSE for details");
+			exit(EXIT_SUCCESS);
+		}
+		else if(!strcmp(argv[i], "-l"))
+			longfmt = True;
+		else
+			break;
+
+	if(i == argc)
+		lsw(DefaultRootWindow(dpy));
+	while(i < argc)
+		lsw(strtol(argv[i++], NULL, 0));
+
+	return EXIT_SUCCESS;
+}
+
+void
+lsw(Window win) {
+	char buf[BUFSIZ];
+	unsigned int i, n;
+	Window *wins, dw;
+	XWindowAttributes wa;
+
+	if(!XQueryTree(dpy, win, &dw, &dw, &wins, &n))
+		return;
+	for(i = 0; i < n; i++)
+		if(XGetWindowAttributes(dpy, win, &wa) && !wa.override_redirect) {
+			getname(wins[i], buf, sizeof buf);
+			if(longfmt)
+				printf("0x%07lx %s\n", wins[i], buf);
+			else if(buf[0] != '\0')
+				puts(buf);
+		}
+	XFree(wins);
+}
+
+void
+getname(Window win, char *buf, size_t size) {
 	char **list = NULL;
 	int n;
 	XTextProperty prop;
 
-	prop.nitems = 0;
-	buf[0] = 0;
-	XGetTextProperty(dpy, w, &prop, netwmname);
-	if(!prop.nitems)
-		XGetWMName(dpy, w, &prop);
-	if(!prop.nitems)
-		return;
+	buf[0] = '\0';
+	if(!XGetTextProperty(dpy, win, &prop, netwmname) || prop.nitems == 0)
+		if(!XGetWMName(dpy, win, &prop) || prop.nitems == 0)
+			return;
+
 	if(prop.encoding == XA_STRING)
-		strncpy(buf, (char *)prop.value, sizeof(buf));
-	else {
-		if(XmbTextPropertyToTextList(dpy, &prop, &list, &n) >= Success
-				&& n > 0 && *list)
-		{
-			strncpy(buf, *list, sizeof(buf));
-			XFreeStringList(list);
-		}
+		strncpy(buf, (char *)prop.value, size);
+	else if(!XmbTextPropertyToTextList(dpy, &prop, &list, &n) && n > 0) {
+		strncpy(buf, list[0], size);
+		XFreeStringList(list);
 	}
 	XFree(prop.value);
-}
-
-int
-main(int argc, char *argv[]) {
-	unsigned int i, num;
-	Window *wins, d1, d2;
-	XWindowAttributes wa;
-	Window win;
-
-	if((argc > 1) && !strncmp(argv[1], "-v", 3)) {
-		fputs("lsw-"VERSION", (C)opyright MMVI Anselm R. Garbe\n", stdout);
-		exit(EXIT_SUCCESS);
-	}
-	if(!(dpy = XOpenDisplay(0))) {
-		fputs("lsw: cannot open display\n", stderr);
-		exit(EXIT_FAILURE);
-	}
-	if(argc == 2)
-		win = atoi(argv[1]);
-	else
-		win = DefaultRootWindow(dpy);
-
-	netwmname = XInternAtom(dpy, "_NET_WM_NAME", False);
-	if(XQueryTree(dpy, win, &d1, &d2, &wins, &num)) {
-		for(i = 0; i < num; i++) {
-			if(!XGetWindowAttributes(dpy, wins[i], &wa))
-				continue;
-			if(wa.override_redirect)
-				continue;
-			getname(wins[i]);
-			if(buf[0])
-				fprintf(stdout, "%s\n", buf);
-		}
-	}
-	if(wins)
-		XFree(wins);
-	XCloseDisplay(dpy);
-	return 0;
 }

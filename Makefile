@@ -1,5 +1,5 @@
 # lsw - list window names
-#   (C)opyright MMVI Anselm R. Garbe
+# See LICENSE file for copyright and license details.
 
 include config.mk
 
@@ -7,7 +7,6 @@ SRC = lsw.c
 OBJ = ${SRC:.c=.o}
 
 all: options lsw
-	@echo finished
 
 options:
 	@echo lsw build options:
@@ -16,13 +15,12 @@ options:
 	@echo "CC       = ${CC}"
 
 .c.o:
-	@echo CC $<
+	@echo CC -c $<
 	@${CC} -c ${CFLAGS} $<
 
 lsw: ${OBJ}
-	@echo LD $@
+	@echo CC -o $@
 	@${CC} -o $@ ${OBJ} ${LDFLAGS}
-	@strip $@
 
 clean:
 	@echo cleaning
@@ -41,9 +39,14 @@ install: all
 	@mkdir -p ${DESTDIR}${PREFIX}/bin
 	@cp -f lsw ${DESTDIR}${PREFIX}/bin
 	@chmod 755 ${DESTDIR}${PREFIX}/bin/lsw
+	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1/lsw.1
+	@sed "s/VERSION/${VERSION}/g" < lsw.1 > ${DESTDIR}${MANPREFIX}/man1/lsw.1
+	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/lsw.1
 
 uninstall:
 	@echo removing executable file from ${DESTDIR}${PREFIX}/bin
 	@rm -f ${DESTDIR}${PREFIX}/bin/lsw
+	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
+	@rm -f ${DESTDIR}${MANPREFIX}/man1/lsw.1
 
 .PHONY: all options clean dist install uninstall
