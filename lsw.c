@@ -10,7 +10,7 @@ static void getname(Window win, char *buf, size_t size);
 static void lsw(Window win);
 
 static Atom netwmname;
-static Bool longfmt = False;
+static Bool lflag = False;
 static Display *dpy;
 
 int
@@ -29,7 +29,7 @@ main(int argc, char *argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 		else if(!strcmp(argv[i], "-l"))
-			longfmt = True;
+			lflag = True;
 		else
 			break;
 
@@ -38,6 +38,7 @@ main(int argc, char *argv[]) {
 	while(i < argc)
 		lsw(strtol(argv[i++], NULL, 0));
 
+	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
 }
 
@@ -53,9 +54,9 @@ lsw(Window win) {
 	for(i = 0; i < n; i++)
 		if(XGetWindowAttributes(dpy, win, &wa) && !wa.override_redirect) {
 			getname(wins[i], buf, sizeof buf);
-			if(longfmt)
+			if(lflag)
 				printf("0x%07lx %s\n", wins[i], buf);
-			else if(buf[0] != '\0')
+			else if(*buf)
 				puts(buf);
 		}
 	XFree(wins);
