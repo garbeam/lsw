@@ -35,7 +35,7 @@ main(int argc, char *argv[]) {
 
 	if(i == argc)
 		lsw(DefaultRootWindow(dpy));
-	while(i < argc)
+	else while(i < argc)
 		lsw(strtol(argv[i++], NULL, 0));
 
 	XCloseDisplay(dpy);
@@ -55,7 +55,7 @@ lsw(Window win) {
 		if(XGetWindowAttributes(dpy, win, &wa) && !wa.override_redirect) {
 			getname(wins[i], buf, sizeof buf);
 			if(lflag)
-				printf("0x%07lx %s\n", wins[i], buf);
+				printf("0x%lx %s\n", wins[i], buf);
 			else if(*buf)
 				puts(buf);
 		}
