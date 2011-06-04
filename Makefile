@@ -29,7 +29,7 @@ clean:
 dist: clean
 	@echo creating dist tarball
 	@mkdir -p lsw-${VERSION}
-	@cp -R LICENSE Makefile README config.mk ${SRC} lsw-${VERSION}
+	@cp -R LICENSE Makefile README config.mk lsw.1 ${SRC} lsw-${VERSION}
 	@tar -cf lsw-${VERSION}.tar lsw-${VERSION}
 	@gzip lsw-${VERSION}.tar
 	@rm -rf lsw-${VERSION}
