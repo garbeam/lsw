@@ -40,6 +40,7 @@ install: all
 	@cp -f lsw ${DESTDIR}${PREFIX}/bin
 	@chmod 755 ${DESTDIR}${PREFIX}/bin/lsw
 	@echo installing manual page to ${DESTDIR}${MANPREFIX}/man1/lsw.1
+	@mkdir -p ${DESTDIR}${MANPREFIX}/man1
 	@sed "s/VERSION/${VERSION}/g" < lsw.1 > ${DESTDIR}${MANPREFIX}/man1/lsw.1
 	@chmod 644 ${DESTDIR}${MANPREFIX}/man1/lsw.1
 
