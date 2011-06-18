@@ -3,17 +3,9 @@
 lsw \- list window titles
 .SH SYNOPSIS
 .B lsw
-.RB [ \-l ]
-.RB [ \-v ]
 .RI [ windows ...]
 .SH DESCRIPTION
 .B lsw
-prints the titles of the given X windows' children to stdout.  If no windows are
-given the root window is used.
-.SH OPTIONS
-.TP
-.B \-l
-lsw lists each window's XID as well as its title.
-.TP
-.B \-v
-prints version information to stdout, then exits.
+prints the title and XID of each child of each
+.IR window .
+If none are given the root window is used.

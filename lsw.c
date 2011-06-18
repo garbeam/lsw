@@ -10,7 +10,6 @@ static void getname(Window win, char *buf, size_t size);
 static void lsw(Window win);
 
 static Atom netwmname;
-static Bool lflag = False;
 static Display *dpy;
 
 int
@@ -23,20 +22,10 @@ main(int argc, char *argv[]) {
 	}
 	netwmname = XInternAtom(dpy, "_NET_WM_NAME", False);
 
-	for(i = 1; i < argc; i++)
-		if(!strcmp(argv[i], "-v")) {
-			puts("lsw-"VERSION", © 2006-2011 lsw engineers, see LICENSE for details");
-			exit(EXIT_SUCCESS);
-		}
-		else if(!strcmp(argv[i], "-l"))
-			lflag = True;
-		else
-			break;
-
-	if(i == argc)
+	if(argc < 2)
 		lsw(DefaultRootWindow(dpy));
-	else while(i < argc)
-		lsw(strtol(argv[i++], NULL, 0));
+	else for(i = 1; i < argc; i++)
+		lsw(strtol(argv[i], NULL, 0));
 
 	XCloseDisplay(dpy);
 	return EXIT_SUCCESS;
@@ -55,17 +44,14 @@ lsw(Window win) {
 		if(XGetWindowAttributes(dpy, wins[i], &wa)
 		&& !wa.override_redirect && wa.map_state == IsViewable) {
 			getname(wins[i], buf, sizeof buf);
-			if(lflag)
-				printf("0x%07lx %s\n", wins[i], buf);
-			else if(*buf)
-				puts(buf);
+			printf("0x%07lx %s\n", wins[i], buf);
 		}
 	XFree(wins);
 }
 
 void
 getname(Window win, char *buf, size_t size) {
-	char **list = NULL;
+	char **list;
 	int n;
 	XTextProperty prop;
 
