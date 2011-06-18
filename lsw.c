@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
@@ -17,7 +16,7 @@ main(int argc, char *argv[]) {
 	int i;
 
 	if(!(dpy = XOpenDisplay(NULL))) {
-		fputs("lsw: cannot open display\n", stderr);
+		fprintf(stderr, "%s: cannot open display\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	netwmname = XInternAtom(dpy, "_NET_WM_NAME", False);

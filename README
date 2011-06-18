@@ -1,6 +1,6 @@
-lsw - list window titles
-========================
-Prints all window titles of DISPLAY to standard output.
+lsw - list windows
+==================
+lsw prints the title and XID of windows to stdout.
 
 
 Requirements
