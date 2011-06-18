@@ -10,6 +10,7 @@ static void getname(Window win, char *buf, size_t size);
 static void lsw(Window win);
 
 static Atom netwmname;
+static Bool aflag = False;
 static Bool lflag = False;
 static Display *dpy;
 
@@ -28,6 +29,8 @@ main(int argc, char *argv[]) {
 			puts("lsw-"VERSION", © 2006-2011 lsw engineers, see LICENSE for details");
 			exit(EXIT_SUCCESS);
 		}
+		else if(!strcmp(argv[i], "-a"))
+			aflag = True;
 		else if(!strcmp(argv[i], "-l"))
 			lflag = True;
 		else
@@ -52,7 +55,8 @@ lsw(Window win) {
 	if(!XQueryTree(dpy, win, &dw, &dw, &wins, &n))
 		return;
 	for(i = 0; i < n; i++)
-		if(XGetWindowAttributes(dpy, win, &wa) && !wa.override_redirect) {
+		if(aflag || (XGetWindowAttributes(dpy, wins[i], &wa)
+		&& !wa.override_redirect && wa.map_state == IsViewable)) {
 			getname(wins[i], buf, sizeof buf);
 			if(lflag)
 				printf("0x%lx %s\n", wins[i], buf);
@@ -72,7 +76,6 @@ getname(Window win, char *buf, size_t size) {
 	if(!XGetTextProperty(dpy, win, &prop, netwmname) || prop.nitems == 0)
 		if(!XGetWMName(dpy, win, &prop) || prop.nitems == 0)
 			return;
-
 	if(prop.encoding == XA_STRING)
 		strncpy(buf, (char *)prop.value, size);
 	else if(!XmbTextPropertyToTextList(dpy, &prop, &list, &n) && n > 0) {
