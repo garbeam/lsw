@@ -58,9 +58,9 @@ getname(Window win) {
 	if(!XmbTextPropertyToTextList(dpy, &prop, &list, &n) && n > 0) {
 		strncpy(buf, list[0], sizeof buf);
 		XFreeStringList(list);
-	}
-	else
+	} else
 		strncpy(buf, (char *)prop.value, sizeof buf);
 	XFree(prop.value);
+	buf[sizeof buf - 1] = '\0';
 	return buf;
 }
